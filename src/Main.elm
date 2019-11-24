@@ -8,8 +8,9 @@ import Element exposing (Color, Device, DeviceClass(..), Element, Orientation(..
 import Element.Background as Background
 import Element.Border as Border
 import Element.Font as Font
+import Element.Input as Input
 import List.Extra as List
-import Resources exposing (Detail)
+import Resources exposing (Detail, Tag)
 import Svg
 import Svg.Attributes
 import Task
@@ -26,17 +27,23 @@ main =
 
 
 type alias Model =
-    Device
+    { device : Device
+    , filter : Maybe Tag
+    }
 
 
 type Msg
     = Resize Int Int
     | InitialSize Viewport
+    | SetFilter Tag
+    | ResetFilter
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { class = Desktop, orientation = Landscape }
+    ( { device = { class = Desktop, orientation = Landscape }
+      , filter = Nothing
+      }
     , Browser.Dom.getViewport
         |> Task.perform InitialSize
     )
@@ -48,17 +55,23 @@ subscriptions _ =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg _ =
+update msg model =
     case msg of
         Resize w h ->
-            ( Element.classifyDevice { height = h, width = w }, Cmd.none )
+            ( { model | device = Element.classifyDevice { height = h, width = w } }, Cmd.none )
 
         InitialSize { viewport } ->
-            ( Element.classifyDevice { height = floor viewport.height, width = floor viewport.width }, Cmd.none )
+            ( { model | device = Element.classifyDevice { height = floor viewport.height, width = floor viewport.width } }, Cmd.none )
+
+        SetFilter tag ->
+            ( { model | filter = Just tag }, Cmd.none )
+
+        ResetFilter ->
+            ( { model | filter = Nothing }, Cmd.none )
 
 
 view : Model -> Document Msg
-view { class } =
+view { device, filter } =
     { title = "Elm Resources"
     , body =
         [ Element.layout
@@ -75,9 +88,19 @@ view { class } =
                 [ titleElement
                 , introElement
                 , Element.el [ Element.height (Element.px 16) ] Element.none
-                , viewGroup
+                , Element.row
+                    [ Element.centerX
+                    , Element.spacing 16
+                    ]
+                    ([ Element.el [ Font.color (Element.rgb 1 1 1) ] (Element.text "Filter:")
+                     , viewFilterReset (filter == Nothing)
+                     ]
+                        ++ List.map (viewFilter filter) Resources.allTags
+                    )
+                , Element.el [ Element.height (Element.px 16) ] Element.none
+                , viewResources
                     "Resources"
-                    (case class of
+                    (case device.class of
                         Phone ->
                             ( 1, True )
 
@@ -87,11 +110,47 @@ view { class } =
                         _ ->
                             ( 3, False )
                     )
-                    Resources.resources
+                    (case filter of
+                        Nothing ->
+                            Resources.resources
+
+                        Just tag ->
+                            List.filter (\{ tags } -> List.member tag tags) Resources.resources
+                    )
                 , outroElement
                 ]
         ]
     }
+
+
+viewFilterReset : Bool -> Element Msg
+viewFilterReset active =
+    viewFilterButton "All" ResetFilter active
+
+
+viewFilter : Maybe Tag -> Tag -> Element Msg
+viewFilter filter tag =
+    viewFilterButton
+        (Resources.tagToString tag)
+        (SetFilter tag)
+        (case filter of
+            Just t -> t == tag
+            Nothing -> False
+        )
+
+
+viewFilterButton : String -> Msg -> Bool -> Element Msg
+viewFilterButton label msg active =
+    Input.button
+        [ Border.solid
+        , Border.width 1
+        , Element.paddingXY 16 8
+        , Background.color <| if active then elmGreen else Element.rgb 1 1 1
+        , Border.rounded 3
+        ]
+        { onPress = Just msg
+        , label = Element.text label
+        }
 
 
 titleElement : Element msg
@@ -158,8 +217,8 @@ outroElement =
         ]
 
 
-viewGroup : String -> ( Int, Bool ) -> List Detail -> Element Msg
-viewGroup title ( columns, stretch ) items =
+viewResources : String -> ( Int, Bool ) -> List Detail -> Element Msg
+viewResources title ( columns, stretch ) items =
     Element.column
         [ Element.width <|
             if stretch then
@@ -193,13 +252,17 @@ viewGroup title ( columns, stretch ) items =
 
 
 viewItem : Bool -> Detail -> Element Msg
-viewItem stretch { what, url, why } =
+viewItem stretch { what, url, why, tags } =
     Element.el
         [ Border.solid
         , Border.width 2
         , Border.rounded 3
         , Element.width <|
-            if stretch then Element.fill else Element.fill |> Element.maximum 256
+            if stretch then
+                Element.fill
+
+            else
+                Element.fill |> Element.maximum 256
         , Element.height (Element.px 256)
         , Element.mouseOver
             [ Border.shadow
@@ -229,15 +292,30 @@ viewItem stretch { what, url, why } =
             { url = url
             , label =
                 Element.column
-                    [ Element.alignTop ]
+                    [ Element.height Element.fill ]
                     [ Element.el [ Font.underline ] (Element.text what)
                     , Element.el [ Element.height (Element.px 16) ] Element.none
                     , Element.paragraph
-                        []
+                        [ Element.height Element.fill ]
                         [ Element.text why ]
+                    , Element.row
+                        [ Element.alignRight ]
+                        (List.map viewTag tags)
                     ]
             }
         )
+
+
+viewTag : Tag -> Element msg
+viewTag tag =
+    Element.el
+        [ Background.color elmGreen
+        , Element.paddingXY 8 4
+        , Border.rounded 3
+        , Border.solid
+        , Border.width 1
+        ]
+        (Element.text (Resources.tagToString tag))
 
 
 groupEvery : Int -> List a -> List (List a)
@@ -259,6 +337,10 @@ groupEvery every list =
         list
         |> Array.map Array.toList
         |> Array.toList
+
+
+
+---- COLORS ----
 
 
 elmGray : Color

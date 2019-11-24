@@ -4,3 +4,5 @@ elm-stuff
 repl-temp-*
 # Mac file
 .DS_Store
+# build only file
+elm.js
