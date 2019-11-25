@@ -92,7 +92,7 @@ view { device, filter } =
                     [ Element.centerX
                     , Element.spacing 16
                     ]
-                    ([ Element.el [ Font.color (Element.rgb 1 1 1) ] (Element.text "Filter:")
+                    ([ Element.el [ Font.color colorWhite ] (Element.text "Filter:")
                      , viewFilterReset (filter == Nothing)
                      ]
                         ++ List.map (viewFilter filter) Resources.allTags
@@ -134,8 +134,11 @@ viewFilter filter tag =
         (Resources.tagToString tag)
         (SetFilter tag)
         (case filter of
-            Just t -> t == tag
-            Nothing -> False
+            Just t ->
+                t == tag
+
+            Nothing ->
+                False
         )
 
 
@@ -145,7 +148,12 @@ viewFilterButton label msg active =
         [ Border.solid
         , Border.width 1
         , Element.paddingXY 16 8
-        , Background.color <| if active then elmGreen else Element.rgb 1 1 1
+        , Background.color <|
+            if active then
+                elmGreen
+
+            else
+                colorWhite
         , Border.rounded 3
         ]
         { onPress = Just msg
@@ -164,7 +172,7 @@ titleElement =
             }
         , Element.width Element.fill
         , Element.padding 8
-        , Font.color (Element.rgb 1 1 1)
+        , Font.color colorWhite
         , Font.size 32
         ]
         [ elmLogo
@@ -185,10 +193,18 @@ introElement =
         , Element.width Element.fill
         , Element.padding 16
         , Font.size 16
-        , Font.color (Element.rgb 1 1 1)
+        , Font.color colorWhite
         , Font.center
         ]
-        [ Element.text "A collection of resources for learning and using Elm. There are books, courses, tutorials, and tools that other developers have found useful." ]
+        [ Element.text "An opinionated collection of resources for learning and using Elm. There are books, courses, tutorials, and tools that other developers have found useful. Curated by "
+        , Element.newTabLink
+            [ Font.underline
+            , Font.color elmBlue
+            ]
+            { url = "https://wolfadex.github.io/resume-vanilla/about"
+            , label = Element.text "Wolfgang Schuster"
+            }
+        ]
 
 
 outroElement : Element msg
@@ -202,7 +218,7 @@ outroElement =
             }
         , Element.width Element.fill
         , Element.padding 8
-        , Font.color (Element.rgb 1 1 1)
+        , Font.color colorWhite
         , Font.size 16
         , Font.center
         ]
@@ -282,7 +298,7 @@ viewItem stretch { what, url, why, tags } =
                 }
             , Border.color elmOrange
             ]
-        , Background.color (Element.rgb 1 1 1)
+        , Background.color colorWhite
         ]
         (Element.newTabLink
             [ Element.padding 16
@@ -292,7 +308,9 @@ viewItem stretch { what, url, why, tags } =
             { url = url
             , label =
                 Element.column
-                    [ Element.height Element.fill ]
+                    [ Element.height Element.fill
+                    , Element.width Element.fill
+                    ]
                     [ Element.el [ Font.underline ] (Element.text what)
                     , Element.el [ Element.height (Element.px 16) ] Element.none
                     , Element.paragraph
@@ -361,6 +379,11 @@ elmGreen =
 elmOrange : Color
 elmOrange =
     Element.rgb255 240 173 0
+
+
+colorWhite : Color
+colorWhite =
+    Element.rgb 1 1 1
 
 
 elmLogo : Element msg

@@ -36,6 +36,11 @@ resources =
       , why = "The best starting place"
       , tags = [ Text ]
       }
+    , { what = "Elm Packages"
+      , url = "https://package.elm-lang.org/"
+      , why = "The one place to find all Elm packages"
+      , tags = [ Tool ]
+      }
     , { what = "TEA Explained"
       , url = "https://medium.com/@l.mugnaini/the-elm-architecture-tea-animation-3efc555e8faf"
       , why = "An animated explication of The Elm Architechture (TEA)."
