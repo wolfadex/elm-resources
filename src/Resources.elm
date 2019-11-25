@@ -78,7 +78,7 @@ resources =
       }
     , { what = "Elm Analyse"
       , url = "https://stil4m.github.io/elm-analyse/"
-      , why = "A llows you to analyse your Elm code, identify deficiencies, and apply best practices."
+      , why = "Allows you to analyse your Elm code, identify deficiencies, and apply best practices."
       , tags = [ Tool ]
       }
     -- Not sure which book(s) to recommend
