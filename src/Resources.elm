@@ -86,6 +86,11 @@ resources =
       , why = "Allows you to analyse your Elm code, identify deficiencies, and apply best practices."
       , tags = [ Tool ]
       }
+    , { what = "Elm Search"
+      , url = "https://klaftertief.github.io/elm-search/"
+      , why = "Search Elm modules by function name or signature."
+      , tags = [ Tool ]
+      }
     -- Not sure which book(s) to recommend
     --, { what = "Programming Elm"
     --  , url = "https://pragprog.com/book/jfelm/programming-elm"
