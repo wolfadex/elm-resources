@@ -86,6 +86,16 @@ resources =
       , why = "Allows you to analyse your Elm code, identify deficiencies, and apply best practices."
       , tags = [ Tool ]
       }
+    , { what = "Sublime Text"
+      , url = "https://www.sublimetext.com/"
+      , why = "Great editor that's as easy to use as VS Code and Atom, while being as powerful as VIM."
+      , tags = [ Tool ]
+      }
+    , { what = "Elm Language Server"
+      , url = "https://github.com/elm-tooling/elm-language-server"
+      , why = "For most editors, using a language server is your best option. IntelliJ IDEA and Atom each have their own plugins that are really fantastic."
+      , tags = [ Tool ]
+      }
     , { what = "Elm Search"
       , url = "https://klaftertief.github.io/elm-search/"
       , why = "Search Elm modules by function name or signature."
